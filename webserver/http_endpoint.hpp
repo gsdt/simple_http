@@ -13,6 +13,7 @@
 class http_endpoint {
 private:
     std::string complete_url;
+
     friend class std::hash<http_endpoint>;
 
 public:

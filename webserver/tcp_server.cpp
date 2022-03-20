@@ -4,7 +4,7 @@
 
 #include "tcp_server.hpp"
 
-tcp_server::tcp_server(int port): port(port) {
+tcp_server::tcp_server(int port) : port(port), server_fd(0) {
 }
 
 void tcp_server::setup() {
@@ -26,17 +26,17 @@ void tcp_server::setup() {
 
     int opt = 1;
 
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt))) {
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, (char *) &opt, sizeof(opt))) {
         perror("setsockopt error");
         exit(EXIT_FAILURE);
     }
 
-    if (setsockopt(server_fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(tv))) {
+    if (setsockopt(server_fd, SOL_SOCKET, SO_RCVTIMEO, (char *) &tv, sizeof(tv))) {
         perror("setsockopt error");
         exit(EXIT_FAILURE);
     }
 
-    if (setsockopt(server_fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv, sizeof(tv))) {
+    if (setsockopt(server_fd, SOL_SOCKET, SO_SNDTIMEO, (char *) &tv, sizeof(tv))) {
         perror("setsockopt error");
         exit(EXIT_FAILURE);
     }
@@ -53,15 +53,15 @@ void tcp_server::setup() {
 }
 
 tcp_connection tcp_server::accept_client() {
-    tcp_connection connection{};
-    socklen_t addrlen = sizeof(connection.address);
-    if ((connection.fd = accept(server_fd, (struct sockaddr *) &connection.address, &addrlen)) < 0) {
+    struct sockaddr_in addr;
+    socklen_t addrlen = sizeof(addr);
+    int socket_fd = accept(server_fd, (struct sockaddr *) &addr, &addrlen);
+    if (socket_fd < 0) {
         perror("accept");
         exit(EXIT_FAILURE);
     }
-    return connection;
+    return {socket_fd, addr};
 }
 
-tcp_server::tcp_server(): port(8080) {
-
+tcp_server::tcp_server() : port(8080), server_fd(0) {
 }

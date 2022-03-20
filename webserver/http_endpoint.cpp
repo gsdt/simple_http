@@ -19,7 +19,7 @@ bool http_endpoint::match(const std::string &url) const {
     }
     if (url.find(this->complete_url) == 0) {
         if (this->complete_url.back() == '/') {
-            char c = url[this->complete_url.length()-1];
+            char c = url[this->complete_url.length() - 1];
             return c == '/';
         }
         char c = url[this->complete_url.length()];

@@ -24,16 +24,6 @@
 #include <iostream>
 #include <stdexcept>
 
-template <typename T> inline ssize_t handle_EINTR(T fn) {
-    ssize_t res = false;
-    while (true) {
-        res = fn();
-        if (res < 0 && errno == EINTR) { continue; }
-        break;
-    }
-    return res;
-}
-
 class webserver {
 private:
     int port;
@@ -50,25 +40,16 @@ private:
 
     void process_socket(const tcp_connection &connection);
 
-    int read(int socket, char* ptr, size_t size);
-
-    bool read_all(int socket, std::string &data);
-
-    void write(int socket, const std::string &message);
-
-    bool is_readable(int socket, int timeout_sec, int timeout_usec);
-
-    bool is_writeable(int socket, int timeout_sec, int timeout_usec);
-
     void increase_connection();
 
     void decrease_connection();
+
 public:
     explicit webserver();
 
-    void set_port(int port);
+    void set_port(int bind_port);
 
-    void set_max_connection(int max_connection);
+    void set_max_connection(int no_connection);
 
     void start();
 

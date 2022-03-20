@@ -13,7 +13,9 @@
 class http_resource {
 public:
     http_resource();
-    virtual void handle(const std::shared_ptr<http_request>& request, const std::shared_ptr<http_response>& response) = 0;
+
+    virtual void
+    handle(const std::shared_ptr<http_request> &request, const std::shared_ptr<http_response> &response) = 0;
 };
 
 

@@ -36,7 +36,7 @@ void webserver::register_resource(const std::string &path, http_resource *hr) {
 void webserver::process_socket(const tcp_connection &connection) {
     this->increase_connection();
     std::string message;
-    bool success = read_all(connection.fd, message);
+    bool success = connection.read_all(message);
     if (!success) {
         connection.terminate();
         decrease_connection();
@@ -72,80 +72,19 @@ void webserver::process_socket(const tcp_connection &connection) {
             response->set_body("Not found");
         }
     }
-    if (is_writeable(connection.fd, TCP_TIMEOUT_SEC, TCP_TIMEOUT_USEC)) {
-        write(connection.fd, response->get_raw());
+    if (connection.is_writeable(TCP_TIMEOUT_SEC, TCP_TIMEOUT_USEC)) {
+        connection.write(response->get_raw());
     }
     connection.terminate();
     decrease_connection();
 }
 
-
-int webserver::read(int socket, char *ptr, size_t size) {
-    if (is_readable(socket, TCP_TIMEOUT_SEC, TCP_TIMEOUT_USEC)) {
-        return recv(socket, ptr, TCP_BUFFER_SIZE, 0);
-    }
-    return -1;
+void webserver::set_port(int bind_port) {
+    this->port = bind_port;
 }
 
-
-bool webserver::read_all(int socket, std::string &data) {
-    const int MAX_BUFFER = 65535;
-    char buf[MAX_BUFFER];
-
-    if (is_readable(socket, TCP_TIMEOUT_SEC, TCP_TIMEOUT_USEC)) {
-        int n = read(socket, buf, MAX_BUFFER);
-        if (n > 0) {
-            buf[n] = '\n';
-            data = std::string(buf);
-            return true;
-        }
-    }
-    return false;
-}
-
-void webserver::write(int socket, const std::string &message) {
-    ssize_t bytes_sent = send(socket, message.c_str(), message.length(), 0);
-    if (bytes_sent == -1) {
-        perror("can't send data to client");
-        throw std::runtime_error("can't send data to client");
-    }
-}
-
-void webserver::set_port(int port) {
-    this->port = port;
-}
-
-void webserver::set_max_connection(int max_connection) {
-    this->max_connection = max_connection;
-}
-
-bool webserver::is_readable(int socket, int timeout_sec, int timeout_usec) {
-    fd_set rfds;
-    FD_ZERO(&rfds);
-    FD_SET(socket, &rfds);
-    timeval tv;
-    tv.tv_usec = timeout_usec;
-    tv.tv_sec = timeout_sec;
-    ssize_t v = select(static_cast<int>(socket + 1), &rfds, nullptr, nullptr, &tv);
-    return  v > 0;
-}
-
-bool webserver::is_writeable(int socket, int timeout_sec, int timeout_usec) {
-    fd_set fds;
-    FD_ZERO(&fds);
-    FD_SET(socket, &fds);
-
-    timeval tv;
-    tv.tv_sec = timeout_sec;
-    tv.tv_usec = timeout_usec;
-
-    int val = select(socket + 1, nullptr, &fds, nullptr, &tv);
-    if (val == 0) {
-        perror("select timeout");
-    } else if (val == -1) {
-        perror("select error");
-    }
-    return val > 0;
+void webserver::set_max_connection(int no_connection) {
+    this->max_connection = no_connection;
 }
 
 void webserver::increase_connection() {

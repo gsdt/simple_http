@@ -4,6 +4,7 @@
 
 #ifndef TUAN_HTTP_CONSTANT_HPP
 #define TUAN_HTTP_CONSTANT_HPP
+
 #include <string>
 #include <unordered_map>
 
@@ -52,13 +53,13 @@ const std::unordered_map<int, std::string> STATUS_LINES = {
 };
 
 const std::unordered_map<std::string, std::string> FILE_CONTENT_TYPE = {
-        {"css", "text/css"},
+        {"css",  "text/css"},
         {"html", "text/html"},
-        {"js", "text/javascript"},
-        {"jpg", "image/jpeg"},
+        {"js",   "text/javascript"},
+        {"jpg",  "image/jpeg"},
         {"jpeg", "image/jpeg"},
-        {"png", "image/png"},
-        {"ico", "image/x-icon"},
+        {"png",  "image/png"},
+        {"ico",  "image/x-icon"},
 };
 
 #endif //TUAN_HTTP_CONSTANT_HPP

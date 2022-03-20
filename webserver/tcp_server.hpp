@@ -5,20 +5,7 @@
 #ifndef TUAN_HTTP_TCP_SERVER_HPP
 #define TUAN_HTTP_TCP_SERVER_HPP
 
-#include <netinet/in.h>
-#include <iostream>
-#include <stdexcept>
-#include <unistd.h>
-
-
-struct tcp_connection {
-    int fd;
-    struct sockaddr_in address;
-
-    void terminate() const {
-        close(fd);
-    }
-};
+#include "tcp_connection.hpp"
 
 class tcp_server {
 private:
@@ -26,8 +13,11 @@ private:
     int port;
 public:
     tcp_server();
+
     explicit tcp_server(int port);
+
     void setup();
+
     tcp_connection accept_client();
 };
 
