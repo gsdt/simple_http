@@ -61,7 +61,7 @@ void webserver::process_socket(const tcp_connection &connection) {
                     resource->handle(request, response);
                 } catch (...) {
                     response->set_status_code(500);
-                    response->set_body("Sever error: ");
+                    response->set_body("Internal sever error");
                 }
                 break;
             }
@@ -72,8 +72,9 @@ void webserver::process_socket(const tcp_connection &connection) {
             response->set_body("Not found");
         }
     }
-
-    write(connection.fd, response->get_raw());
+    if (is_writeable(connection.fd, TCP_TIMEOUT_SEC, TCP_TIMEOUT_USEC)) {
+        write(connection.fd, response->get_raw());
+    }
     connection.terminate();
     decrease_connection();
 }
